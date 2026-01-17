@@ -128,7 +128,7 @@ python3 -m sglang.launch_multi_model_server --port 30000 --model-config-file ./m
 
 python3 benchmark.py \
   --base-url http://127.0.0.1:30000 \
-  --real-trace ./real_trace.pkl \
+  # --real-trace ./real_trace.pkl \
   --model-ids 0 1 \
   --num-gpus 1 \
   --workload-scale 1 \
