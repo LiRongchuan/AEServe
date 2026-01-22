@@ -41,16 +41,6 @@ sudo docker run -dit --gpus all --ipc=host --network=host \
     --name dev-sglang \
     lmsysorg/sglang:v0.3.4.post2-cu121 bash
 ```
-If you are using H100 from the SGLang team, change the mount directory of `.cache`.
-```bash
-docker run -dit --gpus all --ipc=host --network=host \
-    -v `pwd`/sglang-multi-model:/sgl-workspace/sglang-multi-model/ \
-    -v `pwd`/kvcached:/sgl-workspace/kvcached \
-    -v /opt/dlami/nvme/.cache:/root/.cache \
-    --env "HF_TOKEN={your_huggingface_token}" \
-    --name dev-{your_name} \
-    lmsysorg/sglang:v0.3.4.post2-cu121 bash
-```
 
 2. Login to the container.
 ```bash
@@ -80,9 +70,43 @@ python3 setup.py install
 echo 'export HF_ENDPOINT="https://hf-mirror.com"' >> ~/.bashrc
 source ~/.bashrc
 huggingface-cli login
+# Use your token to login
+```
+```bash
+cd /sgl-workspace/prism-public/benchmark/multi-model
+
+# AEServe测试，修改config file
+python3 -m sglang.launch_multi_model_server --port 30000 --model-config-file ./model_configs/setup.json --disable-cuda-graph --disable-radix-cache --enable-controller --enable-cpu-share-memory --enable-elastic-memory --use-kvcached-v0 --policy resize-global --log-file ./server.log --async-loading
+
+# Prism测试，修改config file
+python3 -m sglang.launch_multi_model_server --port 30000 --model-config-file ./model_configs/llama_1_gpu_2_model_prism.json  --disable-cuda-graph --disable-radix-cache --enable-controller --enable-gpu-scheduler --enable-cpu-share-memory --enable-elastic-memory --use-kvcached-v0 --policy baseline --log-file ./server.log --async-loading
+
+# Arena-trace测试，修改num-gpus和rate-scale
+python3 benchmark.py \
+  --base-url http://127.0.0.1:30000 \
+  --real-trace ./real_trace.pkl \
+  --model-ids 0 1 \
+  --num-gpus 1 \
+  --workload-scale 1 \
+  --rate-scale 5 \
+  --ttft-slo-scale 10 \
+  --tpot-slo-scale 10
+
+# SharedGPT测试，修改num-gpus和rate-scale
+python3 benchmark.py \
+  --base-url http://127.0.0.1:30000 \
+  --sharedgpt ./sharedgpt/sharedgpt_n3_rate_4.json \
+  --model-ids 0 1 \
+  --num-gpus 4 \
+  --workload-scale 1 \
+  --rate-scale 1 \
+  --ttft-slo-scale 10 \
+  --tpot-slo-scale 10
 ```
 
-## Run multi-model tests
+
+
+<!-- ## Run multi-model tests
 
 ### Single model 
 
@@ -120,15 +144,18 @@ Note that:
 Launch server with
 
 ```bash
-cd /sgl-workspace/prism-public/benchmark/multi-model
+cd /sgl-workspace/prism-research/benchmark/multi-model
 
-python3 -m sglang.launch_multi_model_server --port 30000 --model-config-file ./model_configs/setup.json  --disable-cuda-graph --disable-radix-cache --enable-controller --enable-cpu-share-memory --enable-elastic-memory --use-kvcached-v0 --policy resize-global --log-file ./server.log --async-loading
+# AEServe测试，修改config file
+python3 -m sglang.launch_multi_model_server --port 30000 --model-config-file ./model_configs/llama_1_gpu_2_model.json  --disable-cuda-graph --disable-radix-cache --enable-controller --enable-cpu-share-memory --enable-elastic-memory --use-kvcached-v0 --policy resize-global --log-file ./server.log --async-loading
 
-python3 -m sglang.launch_multi_model_server --port 30000 --model-config-file ./model_configs/1_gpu_2_model_prism.json  --disable-cuda-graph --disable-radix-cache --enable-controller --enable-gpu-scheduler --enable-cpu-share-memory --enable-elastic-memory --use-kvcached-v0 --policy baseline --log-file ./server.log --async-loading
+# Prism测试，修改config file
+python3 -m sglang.launch_multi_model_server --port 30000 --model-config-file ./model_configs/llama_1_gpu_2_model_prism.json  --disable-cuda-graph --disable-radix-cache --enable-controller --enable-gpu-scheduler --enable-cpu-share-memory --enable-elastic-memory --use-kvcached-v0 --policy baseline --log-file ./server.log --async-loading
 
+# Arena-trace测试，修改num-gpus和rate-scale
 python3 benchmark.py \
   --base-url http://127.0.0.1:30000 \
-  # --real-trace ./real_trace.pkl \
+  --real-trace ./real_trace.pkl \
   --model-ids 0 1 \
   --num-gpus 1 \
   --workload-scale 1 \
@@ -136,6 +163,7 @@ python3 benchmark.py \
   --ttft-slo-scale 10 \
   --tpot-slo-scale 10
 
+# SharedGPT测试，修改num-gpus和rate-scale
 python3 benchmark.py \
   --base-url http://127.0.0.1:30000 \
   --sharedgpt ./sharedgpt/sharedgpt_n3_rate_4.json \
@@ -225,4 +253,4 @@ python3 benchmark.py \
   --seed 42 \
   --memory-pool-size 16 \
   --req-rate 20
-``` 
+```  -->

@@ -5,7 +5,7 @@
         "tp_size": 1,
         "init_placements": [
             {
-                "gpu_ids": [0],
+                "gpu_ids": [3],
                 "on": true,
                 "max_memory_pool_size": 5,
                 "enable_mixed_chunk": true
@@ -18,7 +18,7 @@
         "tp_size": 1,
         "init_placements": [
             {
-                "gpu_ids": [0],
+                "gpu_ids": [3],
                 "on": true,
                 "max_memory_pool_size": 5,
                 "enable_mixed_chunk": true

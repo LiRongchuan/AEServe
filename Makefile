@@ -6,6 +6,7 @@ GPU_SCHEDULER_LOG := benchmark/multi-model/server.log.gpu_scheduler.log
 MODEL_SCHEDULER_LOG := benchmark/multi-model/server.log.model_scheduler.log
 BENCHMARK_RESULT := benchmark/multi-model/benchmark-results
 BENCHMARK_STATS := benchmark/multi-model/benchmark/multi-model
+INTERMEDIATE_FILE := benchmark/multi-model/*_to_*
 REQUEST_OUTPUT := benchmark/multi-model/output-requests
 # 默认目标：显示帮助信息
 .DEFAULT_GOAL := help
@@ -48,6 +49,12 @@ clean:
 	else \
 		echo "测试统计不存在: $(BENCHMARK_STATS)"; \
 	fi
+	@if ls $(INTERMEDIATE_FILE) 1> /dev/null 2>&1; then \
+		rm -f $(INTERMEDIATE_FILE); \
+		echo "已清理中间文件: $(INTERMEDIATE_FILE)"; \
+	else \
+		echo "中间文件不存在: $(INTERMEDIATE_FILE)"; \
+	fi
 	@if [ -d "$(REQUEST_OUTPUT)" ]; then \
 		rm -rf "$(REQUEST_OUTPUT)"; \
 		echo "已清理请求输出: $(REQUEST_OUTPUT)"; \
@@ -85,6 +92,12 @@ clean-log:
 		echo "已清理测试统计: $(BENCHMARK_STATS)"; \
 	else \
 		echo "测试统计不存在: $(BENCHMARK_STATS)"; \
+	fi
+	@if ls $(INTERMEDIATE_FILE) 1> /dev/null 2>&1; then \
+		rm -f $(INTERMEDIATE_FILE); \
+		echo "已清理中间文件: $(INTERMEDIATE_FILE)"; \
+	else \
+		echo "中间文件不存在: $(INTERMEDIATE_FILE)"; \
 	fi
 	@if [ -d "$(REQUEST_OUTPUT)" ]; then \
 		rm -rf "$(REQUEST_OUTPUT)"; \

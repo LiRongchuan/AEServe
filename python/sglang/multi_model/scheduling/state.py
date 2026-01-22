@@ -36,11 +36,12 @@ class ModelInstanceState:
         self.memory_pool_size = self.init_memory_pool_size
 
     def __str__(self):
-        total_memory = (self.memory_usage.model_weights_memory + self.memory_usage.memory_pool_memory)
-        return (f"Instance {self.instance_idx}: {self.state.name}, memory usage: {total_memory:.2f} GB, gpu_ids: {self.gpu_ids}, "
-               f"memory_pool_size: {self.memory_pool_size} GB, "
-               f"req to token Mem: {self.memory_usage.req_to_token_pool_memory:.2f} GB, "
-               f"token to kv mem: {self.memory_usage.token_to_kv_pool_memory:.2f} GB")
+        return (f"Instance {self.instance_idx}: {self.state.name}, gpu_ids: {self.gpu_ids}, "
+                f"model weight Mem: {self.memory_usage.model_weights_memory} GB, "
+                f"activation Mem: {self.memory_usage.memory_pool_memory} GB, "
+                f"memory pool size: {self.memory_pool_size} GB, "
+                f"req to token Mem: {self.memory_usage.req_to_token_pool_memory:.2f} GB, "
+                f"token to kv mem: {self.memory_usage.token_to_kv_pool_memory:.2f} GB")
 
     def on_activate(self, memory_usage: MemoryUsage, gpu_id: Optional[int] = None):
         self.state = ModelState.ACTIVE
