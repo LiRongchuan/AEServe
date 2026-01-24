@@ -440,8 +440,9 @@ class ActivateReqOutput:
     memory_usage: MemoryUsage
     # necessary for gpu scheduler communication
     model_name: str
-    instance_idx: Optional[int] = 0
+    instance_idx: int = 0
     gpu_id: Optional[int] = None
+    cell_size: Optional[float] = None
 
 
 @dataclass
@@ -516,6 +517,7 @@ class GetMemoryUsageReqOutput:
     rid: str
     model_name: str
     memory_usage: MemoryUsage
+    cell_size: float
 
 
 @dataclass

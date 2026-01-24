@@ -35,25 +35,25 @@ git clone https://github.com/ovg-project/kvcached.git
 1. Start a container running in the background.
 ```bash
 sudo docker run -dit --gpus all --ipc=host --network=host \
-    -v `pwd`/prism-research:/sgl-workspace/prism-research/ \
+    -v `pwd`/aeserve-public:/sgl-workspace/aeserve-public/ \
     -v `pwd`/kvcached:/sgl-workspace/kvcached \
     -v `pwd`/data/lrc/cache/huggingface/:/root/.cache/huggingface \
-    --name dev-sglang \
+    --name aeserve \
     lmsysorg/sglang:v0.3.4.post2-cu121 bash
 ```
 
 2. Login to the container.
 ```bash
-sudo docker start dev-sglang
+sudo docker start aeserve
 ```
 ```bash
-sudo docker exec -it dev-sglang bash
+sudo docker exec -it aeserve bash
 ```
 
 ### Install sglang-multi-model and kvcached
 
 ```bash
-cd /sgl-workspace/prism-research/python
+cd /sgl-workspace/aeserve-public/python
 pip install -e .
 # flashinfer has already been installed in the container
 # pip install flashinfer==0.1.6 -i https://flashinfer.ai/whl/cu121/torch2.4/
@@ -73,7 +73,7 @@ huggingface-cli login
 # Use your token to login
 ```
 ```bash
-cd /sgl-workspace/prism-public/benchmark/multi-model
+cd /sgl-workspace/aeserve-public/benchmark/multi-model
 
 # AEServe测试，修改config file
 python3 -m sglang.launch_multi_model_server --port 30000 --model-config-file ./model_configs/setup.json --disable-cuda-graph --disable-radix-cache --enable-controller --enable-cpu-share-memory --enable-elastic-memory --use-kvcached-v0 --policy resize-global --log-file ./server.log --async-loading
@@ -88,7 +88,7 @@ python3 benchmark.py \
   --model-ids 0 1 \
   --num-gpus 1 \
   --workload-scale 1 \
-  --rate-scale 5 \
+  --rate-scale 1 \
   --ttft-slo-scale 10 \
   --tpot-slo-scale 10
 
